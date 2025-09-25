@@ -23,3 +23,25 @@ export const requestBodySchema = z
   .optional();
 
 export const requestScriptSchema = z.string().optional();
+
+const templatePlaceholderPattern = /\{\{[^}]+\}\}/;
+
+function isValidAbsoluteUrl(value: string): boolean {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function containsTemplatePlaceholder(value: string): boolean {
+  return templatePlaceholderPattern.test(value);
+}
+
+export const requestUrlSchema = z
+  .string()
+  .min(1, "url is required")
+  .refine((value) => containsTemplatePlaceholder(value) || isValidAbsoluteUrl(value), {
+    message: "url must be a valid URL",
+  });

@@ -8,6 +8,7 @@ import {
   requestHeadersSchema,
   requestBodySchema,
   requestScriptSchema,
+  requestUrlSchema,
 } from "../schemas.js";
 
 const createRequestArgs = {
@@ -15,7 +16,7 @@ const createRequestArgs = {
   folderId: folderIdSchema.optional().nullable(),
   name: z.string().min(1, "name is required"),
   method: z.string().min(1, "method is required"),
-  url: z.string().url("url must be a valid URL"),
+  url: requestUrlSchema,
   headers: requestHeadersSchema,
   body: requestBodySchema,
   description: z.string().optional(),

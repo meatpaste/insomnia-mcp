@@ -3,67 +3,7 @@ import path from "node:path";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 
-export interface StoredRequestHeader {
-  name: string;
-  value: string;
-  disabled?: boolean;
-}
-
-export interface StoredRequestBody {
-  mimeType?: string;
-  text?: string;
-  [key: string]: unknown;
-}
-
-export interface StoredRequest {
-  id: string;
-  name: string;
-  method: string;
-  url: string;
-  headers: StoredRequestHeader[];
-  body?: StoredRequestBody | null;
-  description?: string;
-  folderId?: string;
-  preRequestScript?: string;
-  afterResponseScript?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface StoredFolder {
-  id: string;
-  name: string;
-  description?: string;
-  parentId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface StoredEnvironment {
-  id: string;
-  name: string;
-  variables: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface StoredCollection {
-  id: string;
-  name: string;
-  description?: string;
-  environment: StoredEnvironment;
-  folders: StoredFolder[];
-  requests: StoredRequest[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-const WORKSPACE_FILE = "insomnia.Workspace.db";
-const REQUEST_FILE = "insomnia.Request.db";
-const REQUEST_GROUP_FILE = "insomnia.RequestGroup.db";
-const ENVIRONMENT_FILE = "insomnia.Environment.db";
-const PROJECT_FILE = "insomnia.Project.db";
-const DEFAULT_ENVIRONMENT_NAME = "Base Environment";
+const COLLECTION_SCOPE = "collection";
 
 type NdjsonRecord = {
   _id: string;

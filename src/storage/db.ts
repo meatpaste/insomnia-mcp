@@ -3,15 +3,6 @@ import path from "node:path";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 
-import type {
-  StoredCollection,
-  StoredEnvironment,
-  StoredFolder,
-  StoredRequest,
-  StoredRequestBody,
-  StoredRequestHeader,
-} from "./types.js";
-
 export const WORKSPACE_FILE = "insomnia.Workspace.db";
 export const REQUEST_FILE = "insomnia.Request.db";
 export const REQUEST_GROUP_FILE = "insomnia.RequestGroup.db";
@@ -24,6 +15,18 @@ export type NdjsonRecord = {
   type: string;
   [key: string]: unknown;
 };
+
+export interface RequestRecordHeader {
+  name: string;
+  value: string;
+  disabled?: boolean;
+}
+
+export interface RequestRecordBody {
+  mimeType?: string;
+  text?: string;
+  [key: string]: unknown;
+}
 
 export interface WorkspaceRecord extends NdjsonRecord {
   parentId: string;
@@ -42,8 +45,8 @@ export interface RequestRecord extends NdjsonRecord {
   name: string;
   description?: string;
   method: string;
-  headers?: StoredRequestHeader[];
-  body?: StoredRequestBody | null;
+  headers?: RequestRecordHeader[];
+  body?: RequestRecordBody | null;
   preRequestScript?: string;
   afterResponseScript?: string;
   parameters?: unknown[];
@@ -221,238 +224,6 @@ export async function resolveProjectId(): Promise<string> {
     return project._id;
   }
   return "proj_scratchpad";
-}
-
-export function toStoredRequest(record: RequestRecord, collectionId: string): StoredRequest {
-  return {
-    id: record._id,
-    name: record.name,
-    method: record.method,
-    url: record.url,
-    headers: Array.isArray(record.headers) ? record.headers : [],
-    body: record.body ?? null,
-    description: typeof record.description === "string" ? record.description : undefined,
-    folderId: record.parentId !== collectionId ? record.parentId : undefined,
-    preRequestScript: typeof record.preRequestScript === "string" ? record.preRequestScript : undefined,
-    afterResponseScript:
-      typeof record.afterResponseScript === "string" ? record.afterResponseScript : undefined,
-    createdAt: toIso(record.created),
-    updatedAt: toIso(record.modified),
-  };
-}
-
-export function toStoredEnvironment(record: EnvironmentRecord): StoredEnvironment {
-  return {
-    id: record._id,
-    name: record.name,
-    variables: (record.data as Record<string, unknown> | undefined) ?? {},
-    createdAt: toIso(record.created),
-    updatedAt: toIso(record.modified),
-  };
-}
-
-export function toStoredFolder(record: RequestGroupRecord): StoredFolder {
-  return {
-    id: record._id,
-    name: record.name,
-    description:
-      typeof record.description === "string" && record.description.length > 0
-        ? record.description
-        : undefined,
-    parentId: record.parentId,
-    createdAt: toIso(record.created),
-    updatedAt: toIso(record.modified),
-  };
-}
-
-export function toStoredCollection(
-  workspace: WorkspaceRecord,
-  environment: EnvironmentRecord,
-  requests: RequestRecord[],
-  folders: RequestGroupRecord[]
-): StoredCollection {
-  return {
-    id: workspace._id,
-    name: workspace.name,
-    description:
-      typeof workspace.description === "string" && workspace.description.length > 0
-        ? workspace.description
-        : undefined,
-    environment: toStoredEnvironment(environment),
-    folders: folders.map(toStoredFolder),
-    requests: requests.map((request) => toStoredRequest(request, workspace._id)),
-    createdAt: toIso(workspace.created),
-    updatedAt: toIso(workspace.modified),
-  };
-}
-
-export function buildFolderLookup(
-  folders: RequestGroupRecord[]
-): Map<string, RequestGroupRecord> {
-  const lookup = new Map<string, RequestGroupRecord>();
-  for (const folder of folders) {
-    lookup.set(folder._id, folder);
-  }
-  return lookup;
-}
-
-export function folderBelongsToWorkspace(
-  folder: RequestGroupRecord,
-  workspaceId: string,
-  folderLookup: Map<string, RequestGroupRecord>
-): boolean {
-  let parentId = folder.parentId;
-  const visited = new Set<string>();
-  while (parentId) {
-    if (parentId === workspaceId) {
-      return true;
-    }
-    if (visited.has(parentId)) {
-      break;
-    }
-    visited.add(parentId);
-    const parentFolder = folderLookup.get(parentId);
-    if (!parentFolder) {
-      break;
-    }
-    parentId = parentFolder.parentId;
-  }
-  return false;
-}
-
-export function collectFoldersForWorkspace(
-  workspaceId: string,
-  folders: RequestGroupRecord[],
-  folderLookup: Map<string, RequestGroupRecord>
-): RequestGroupRecord[] {
-  return folders.filter((folder) => folderBelongsToWorkspace(folder, workspaceId, folderLookup));
-}
-
-export function requestBelongsToWorkspace(
-  request: RequestRecord,
-  workspaceId: string,
-  folderLookup: Map<string, RequestGroupRecord>
-): boolean {
-  if (request.parentId === workspaceId) {
-    return true;
-  }
-  const folder = folderLookup.get(request.parentId);
-  if (!folder) {
-    return false;
-  }
-  return folderBelongsToWorkspace(folder, workspaceId, folderLookup);
-}
-
-export function collectRequestsForWorkspace(
-  workspaceId: string,
-  requests: RequestRecord[],
-  folderLookup: Map<string, RequestGroupRecord>
-): RequestRecord[] {
-  return requests.filter((request) => requestBelongsToWorkspace(request, workspaceId, folderLookup));
-}
-
-export function ensureFolderInWorkspace(
-  folderId: string,
-  workspaceId: string,
-  folderLookup: Map<string, RequestGroupRecord>
-): RequestGroupRecord {
-  const folder = folderLookup.get(folderId);
-  if (!folder) {
-    throw new Error(`Folder ${folderId} not found`);
-  }
-  if (!folderBelongsToWorkspace(folder, workspaceId, folderLookup)) {
-    throw new Error(`Folder ${folderId} does not belong to collection ${workspaceId}`);
-  }
-  return folder;
-}
-
-export function resolveFolderParentId(
-  workspaceId: string,
-  parentId: string | null | undefined,
-  folderLookup: Map<string, RequestGroupRecord>
-): string {
-  if (!parentId || parentId === workspaceId) {
-    return workspaceId;
-  }
-  const folder = ensureFolderInWorkspace(parentId, workspaceId, folderLookup);
-  return folder._id;
-}
-
-export function resolveRequestParentId(
-  workspaceId: string,
-  folderId: string | null | undefined,
-  folderLookup: Map<string, RequestGroupRecord>
-): string {
-  return resolveFolderParentId(workspaceId, folderId ?? undefined, folderLookup);
-}
-
-export function ensureNoFolderCycle(
-  folderId: string,
-  parentId: string,
-  folderLookup: Map<string, RequestGroupRecord>
-): void {
-  let currentId: string | undefined = parentId;
-  const visited = new Set<string>();
-  while (currentId) {
-    if (currentId === folderId) {
-      throw new Error("Cannot move a folder into itself or its descendants");
-    }
-    if (visited.has(currentId)) {
-      break;
-    }
-    visited.add(currentId);
-    const parentFolder = folderLookup.get(currentId);
-    if (!parentFolder) {
-      break;
-    }
-    currentId = parentFolder.parentId;
-  }
-}
-
-export function collectDescendantFolderIds(
-  folderId: string,
-  folderLookup: Map<string, RequestGroupRecord>
-): Set<string> {
-  const descendants = new Set<string>();
-  const stack: string[] = [folderId];
-  while (stack.length > 0) {
-    const current = stack.pop()!;
-    if (descendants.has(current)) {
-      continue;
-    }
-    descendants.add(current);
-    for (const folder of folderLookup.values()) {
-      if (folder.parentId === current) {
-        stack.push(folder._id);
-      }
-    }
-  }
-  return descendants;
-}
-
-export async function ensureEnvironmentForWorkspace(
-  workspaceId: string,
-  environments: EnvironmentRecord[]
-): Promise<{ environment: EnvironmentRecord; updated: boolean }> {
-  const existing = environments.find((record) => record.parentId === workspaceId);
-  if (existing) {
-    return { environment: existing, updated: false };
-  }
-  const timestamp = nowMillis();
-  const environment = buildEnvironmentRecord(workspaceId, timestamp);
-  environments.push(environment);
-  return { environment, updated: true };
-}
-
-export async function loadWorkspace(
-  workspaceId: string
-): Promise<{ workspace: WorkspaceRecord; all: WorkspaceRecord[] }> {
-  const workspaces = await readWorkspaceRecords();
-  const workspace = workspaces.find((record) => record._id === workspaceId);
-  if (!workspace) {
-    throw new Error(`Collection ${workspaceId} not found`);
-  }
-  return { workspace, all: workspaces };
 }
 
 export function __resetStorageCacheForTests(): void {

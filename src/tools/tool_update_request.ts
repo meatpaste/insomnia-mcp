@@ -9,6 +9,7 @@ import {
   requestHeadersSchema,
   requestBodySchema,
   requestScriptSchema,
+  requestUrlSchema,
 } from "../schemas.js";
 
 const updateRequestArgs = {
@@ -16,7 +17,7 @@ const updateRequestArgs = {
   requestId: requestIdSchema,
   name: z.string().optional(),
   method: z.string().optional(),
-  url: z.string().url().optional(),
+  url: requestUrlSchema.optional(),
   headers: requestHeadersSchema,
   body: requestBodySchema,
   description: z.string().nullable().optional(),
