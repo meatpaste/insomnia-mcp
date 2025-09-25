@@ -5,12 +5,7 @@ import type {
   WorkspaceRecord,
 } from "./db.js";
 import { toIso } from "./db.js";
-import type {
-  StoredCollection,
-  StoredEnvironment,
-  StoredFolder,
-  StoredRequest,
-} from "./types.js";
+import type { StoredCollection, StoredEnvironment, StoredFolder, StoredRequest } from "./types.js";
 
 export function toStoredRequest(record: RequestRecord, collectionId: string): StoredRequest {
   return {

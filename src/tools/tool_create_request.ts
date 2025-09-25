@@ -27,7 +27,7 @@ const createRequestArgs = {
 export function registerCreateRequestTool(server: McpServer): void {
   server.tool(
     "create_request",
-    "Create a request in a collection",
+    "Create a request in a collection (requires collectionId, name, method, url; folderId must reference an existing folder if present)",
     createRequestArgs,
     async (args) => {
       const request = await createRequest({

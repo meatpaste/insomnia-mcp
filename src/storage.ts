@@ -889,6 +889,53 @@ export async function getEnvironment(collectionId: string): Promise<StoredEnviro
   return toStoredEnvironment(environment);
 }
 
+export interface GetRequestInput {
+  collectionId: string;
+  requestId: string;
+}
+
+export async function getRequest(input: GetRequestInput): Promise<StoredRequest> {
+  const { workspace } = await loadWorkspace(input.collectionId);
+  const requestGroups = await readRequestGroupRecords();
+  const folderLookup = buildFolderLookup(requestGroups);
+  const requests = await readRequestRecords();
+  const request = requests.find((record) => record._id === input.requestId);
+  if (!request || !requestBelongsToWorkspace(request, workspace._id, folderLookup)) {
+    throw new Error(`Request ${input.requestId} not found`);
+  }
+  return toStoredRequest(request, workspace._id);
+}
+
+export interface GetFolderInput {
+  collectionId: string;
+  folderId: string;
+}
+
+export async function getFolder(input: GetFolderInput): Promise<StoredFolder> {
+  const { workspace } = await loadWorkspace(input.collectionId);
+  const folders = await readRequestGroupRecords();
+  const folderLookup = buildFolderLookup(folders);
+  const folder = folderLookup.get(input.folderId);
+  if (!folder || !folderBelongsToWorkspace(folder, workspace._id, folderLookup)) {
+    throw new Error(`Folder ${input.folderId} not found`);
+  }
+  return toStoredFolder(folder);
+}
+
+export async function getEnvironmentVariable(
+  collectionId: string,
+  key: string
+): Promise<unknown> {
+  const { workspace } = await loadWorkspace(collectionId);
+  const environments = await readEnvironmentRecords();
+  const { environment, updated } = await ensureEnvironmentForWorkspace(workspace._id, environments);
+  if (updated) {
+    await writeEnvironmentRecords(environments);
+  }
+  const data = (environment.data as Record<string, unknown> | undefined) ?? {};
+  return data[key];
+}
+
 export async function ensureSampleData(): Promise<void> {
   const workspaces = await readWorkspaceRecords();
   if (workspaces.length === 0) {

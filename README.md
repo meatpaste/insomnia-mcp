@@ -40,6 +40,14 @@ Once connected, explore available tools and resources:
 - `delete_folder`
 - `set_environment_variable`
 
+## Tool input reference
+
+- **Request tools (`create_request`, `update_request`, `delete_request`)** – always include `collectionId`. Request creation additionally requires `name`, `method`, and `url`. Updates require `requestId` alongside `collectionId`.
+- **Folder tools (`create_folder`, `update_folder`, `delete_folder`)** – always include `collectionId`. Folder creation requires `name`; updates and deletes require `folderId` as well.
+- **Environment tool (`set_environment_variable`)** – requires `collectionId`, `key`, and `value`.
+
+If a required field such as `collectionId` is missing, the MCP server returns an `invalid_type` error identifying the missing property. Use the schemas in `src/schemas.ts` for the definitive list of required vs optional tool arguments.
+
 ## License
 
 [MIT](./LICENSE) – use, fork, and adapt as needed.

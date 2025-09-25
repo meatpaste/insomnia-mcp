@@ -12,6 +12,7 @@ import {
   ensureSampleData,
   getCollection,
   getEnvironment,
+  getRequest,
   listCollections,
   setEnvironmentVariable,
   updateFolder,
@@ -134,6 +135,24 @@ describe("storage", () => {
     expect(request.preRequestScript).toBe("console.log('pre');");
     expect(request.afterResponseScript).toBe("console.log('post');");
 
+    const collectionSnapshot = await getCollection(collection.id);
+    expect(collectionSnapshot?.requests[0].preRequestScript).toBe("console.log('pre');");
+    expect(collectionSnapshot?.requests[0].afterResponseScript).toBe("console.log('post');");
+
+    const retrievedRequest = await getRequest({
+      collectionId: collection.id,
+      requestId: request.id,
+    });
+    expect(retrievedRequest.preRequestScript).toBe("console.log('pre');");
+    expect(retrievedRequest.afterResponseScript).toBe("console.log('post');");
+
+    const collections = await listCollections();
+    const listRequest = collections
+      .find((item) => item.id === collection.id)
+      ?.requests.find((item) => item.id === request.id);
+    expect(listRequest?.preRequestScript).toBe("console.log('pre');");
+    expect(listRequest?.afterResponseScript).toBe("console.log('post');");
+
     const updated = await updateRequest({
       collectionId: collection.id,
       requestId: request.id,
@@ -155,6 +174,22 @@ describe("storage", () => {
 
     requestRecords = await readNdjson<{ parentId: string }>(REQUEST_FILE);
     expect(requestRecords[0].parentId).toBe(collection.id);
+
+    const updatedWithScript = await updateRequest({
+      collectionId: collection.id,
+      requestId: request.id,
+      preRequestScript: "console.log('re-added pre');",
+      afterResponseScript: "console.log('re-added post');",
+    });
+    expect(updatedWithScript.preRequestScript).toBe("console.log('re-added pre');");
+    expect(updatedWithScript.afterResponseScript).toBe("console.log('re-added post');");
+
+    const persistedUpdated = await getRequest({
+      collectionId: collection.id,
+      requestId: request.id,
+    });
+    expect(persistedUpdated.preRequestScript).toBe("console.log('re-added pre');");
+    expect(persistedUpdated.afterResponseScript).toBe("console.log('re-added post');");
 
     await deleteRequest({ collectionId: collection.id, requestId: request.id });
 
