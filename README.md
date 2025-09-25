@@ -6,7 +6,7 @@
 
 - **Collection management** – list and create collections with auto-persisted metadata.
 - **Folder workflows** – create nested folders (Insomnia request groups), move them around, and delete hierarchies safely.
-- **Request lifecycle** – create, update, and delete HTTP requests with headers, bodies, descriptions, and optional folder placement.
+- **Request lifecycle** – create, update, and delete HTTP requests with headers, bodies, descriptions, optional folder placement, and pre/post request scripts.
 - **Environment variables** – manage per-collection environments.
 
 ## Quick Start - Update your MCP configuration
