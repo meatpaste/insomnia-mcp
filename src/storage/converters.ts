@@ -15,6 +15,7 @@ import type {
 export function toStoredRequest(record: RequestRecord, collectionId: string): StoredRequest {
   return {
     id: record._id,
+    collectionId,
     name: record.name,
     method: record.method,
     url: record.url,

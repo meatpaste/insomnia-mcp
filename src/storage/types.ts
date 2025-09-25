@@ -12,6 +12,7 @@ export interface StoredRequestBody {
 
 export interface StoredRequest {
   id: string;
+  collectionId: string;
   name: string;
   method: string;
   url: string;
