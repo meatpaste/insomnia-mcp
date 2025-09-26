@@ -15,6 +15,14 @@ import { registerGetFolderTool } from "./tools/tool_get_folder.js";
 import { registerGetEnvironmentTool } from "./tools/tool_get_environment.js";
 import { registerGetEnvironmentVariableTool } from "./tools/tool_get_environment_variable.js";
 
+/**
+ * Register all MCP tools with the server
+ *
+ * This function registers all available tools for managing Insomnia collections,
+ * including CRUD operations for collections, requests, folders, and environments.
+ *
+ * @param server - The MCP server instance to register tools with
+ */
 export function registerTools(server: McpServer): void {
   registerListCollectionsTool(server);
   registerCreateCollectionTool(server);

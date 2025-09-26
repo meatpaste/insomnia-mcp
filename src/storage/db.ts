@@ -3,12 +3,15 @@ import path from "node:path";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 
-export const WORKSPACE_FILE = "insomnia.Workspace.db";
-export const REQUEST_FILE = "insomnia.Request.db";
-export const REQUEST_GROUP_FILE = "insomnia.RequestGroup.db";
-export const ENVIRONMENT_FILE = "insomnia.Environment.db";
-export const PROJECT_FILE = "insomnia.Project.db";
-export const DEFAULT_ENVIRONMENT_NAME = "Base Environment";
+import { DATABASE_FILES, DEFAULTS } from "./constants.js";
+import type { StoredRequestHeader, StoredRequestBody } from "./types.js";
+
+export const WORKSPACE_FILE = DATABASE_FILES.WORKSPACE;
+export const REQUEST_FILE = DATABASE_FILES.REQUEST;
+export const REQUEST_GROUP_FILE = DATABASE_FILES.REQUEST_GROUP;
+export const ENVIRONMENT_FILE = DATABASE_FILES.ENVIRONMENT;
+export const PROJECT_FILE = DATABASE_FILES.PROJECT;
+export const DEFAULT_ENVIRONMENT_NAME = DEFAULTS.ENVIRONMENT_NAME;
 
 export type NdjsonRecord = {
   _id: string;
@@ -45,8 +48,8 @@ export interface RequestRecord extends NdjsonRecord {
   name: string;
   description?: string;
   method: string;
-  headers?: RequestRecordHeader[];
-  body?: RequestRecordBody | null;
+  headers?: StoredRequestHeader[];
+  body?: StoredRequestBody | null;
   preRequestScript?: string;
   afterResponseScript?: string;
   parameters?: unknown[];

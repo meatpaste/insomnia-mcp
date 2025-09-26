@@ -1,3 +1,13 @@
+/**
+ * Insomnia MCP Server
+ *
+ * This server provides Model Context Protocol (MCP) tools for managing
+ * Insomnia collections, requests, folders, and environment variables.
+ *
+ * The server reads and writes directly to Insomnia's NDJSON database files,
+ * allowing AI agents to create and modify API collections.
+ */
+
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { ensureSampleData } from "./storage.js";
@@ -5,6 +15,9 @@ import { createServer } from "./server.js";
 import { registerTools } from "./tools.js";
 import { registerResources } from "./resources.js";
 
+/**
+ * Main server entry point
+ */
 async function main(): Promise<void> {
   await ensureSampleData();
 

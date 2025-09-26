@@ -1,3 +1,8 @@
+/**
+ * Types for Insomnia export/import format
+ * These are currently unused but may be needed for future export/import functionality
+ */
+
 export type InsomniaResourceType =
   | "workspace"
   | "request"
