@@ -1,6 +1,6 @@
 {
   "name": "insomnia-mcp",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Model Context Protocol server for Kong Insomnia collections",
   "type": "module",
   "publishConfig": {
