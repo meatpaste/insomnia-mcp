@@ -14,12 +14,16 @@ import { ensureSampleData } from "./storage.js";
 import { createServer } from "./server.js";
 import { registerTools } from "./tools.js";
 import { registerResources } from "./resources.js";
+import { startHttpServer } from "./httpServer.js";
 
 /**
  * Main server entry point
  */
 async function main(): Promise<void> {
   await ensureSampleData();
+
+  // Start HTTP server for Insomnia plugin integration
+  await startHttpServer();
 
   const server = createServer();
   registerTools(server);
