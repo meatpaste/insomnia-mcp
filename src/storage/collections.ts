@@ -10,8 +10,12 @@ import {
   type WorkspaceRecord,
   type EnvironmentRecord,
 } from "./db.js";
-import { toStoredCollection, toStoredEnvironment } from "./converters.js";
-import { collectFoldersForWorkspace, collectRequestsForWorkspace, buildFolderLookup } from "./folderTree.js";
+import { toStoredCollection } from "./converters.js";
+import {
+  collectFoldersForWorkspace,
+  collectRequestsForWorkspace,
+  buildFolderLookup,
+} from "./folderTree.js";
 import { readRequestRecords, readRequestGroupRecords } from "./db.js";
 import { DEFAULTS } from "./constants.js";
 import type { StoredCollection } from "./types.js";
@@ -46,14 +50,23 @@ export async function listCollections(): Promise<StoredCollection[]> {
     if (workspace.scope !== DEFAULTS.COLLECTION_SCOPE) {
       continue;
     }
-    const { environment, updated } = await ensureEnvironmentForWorkspace(workspace._id, environments);
+    const { environment, updated } = await ensureEnvironmentForWorkspace(
+      workspace._id,
+      environments
+    );
     if (updated) {
       envByWorkspace.set(workspace._id, environment);
       environmentsUpdated = true;
     }
-    const collectionFolders = collectFoldersForWorkspace(workspace._id, requestGroups, folderLookup);
+    const collectionFolders = collectFoldersForWorkspace(
+      workspace._id,
+      requestGroups,
+      folderLookup
+    );
     const collectionRequests = collectRequestsForWorkspace(workspace._id, requests, folderLookup);
-    collections.push(toStoredCollection(workspace, environment, collectionRequests, collectionFolders));
+    collections.push(
+      toStoredCollection(workspace, environment, collectionRequests, collectionFolders)
+    );
   }
 
   if (environmentsUpdated) {
@@ -68,7 +81,9 @@ export async function listCollections(): Promise<StoredCollection[]> {
  */
 export async function getCollection(collectionId: string): Promise<StoredCollection | undefined> {
   const workspaces = await readWorkspaceRecords();
-  const workspace = workspaces.find((record) => record._id === collectionId && record.scope === DEFAULTS.COLLECTION_SCOPE);
+  const workspace = workspaces.find(
+    (record) => record._id === collectionId && record.scope === DEFAULTS.COLLECTION_SCOPE
+  );
   if (!workspace) {
     return undefined;
   }

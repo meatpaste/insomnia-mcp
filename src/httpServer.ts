@@ -5,20 +5,20 @@
  * that Insomnia can import from, enabling auto-refresh functionality.
  */
 
-import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { config } from './config.js';
-import { listCollections, getCollection } from './storage/index.js';
+import { createServer, IncomingMessage, ServerResponse } from "http";
+import { config } from "./config.js";
+import { listCollections, getCollection } from "./storage/index.js";
 
 const PORT = config.httpServer.port;
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Content-Type': 'application/json'
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Content-Type": "application/json",
 };
 
 interface InsomniaExport {
-  _type: 'export';
+  _type: "export";
   __export_format: number;
   __export_date: string;
   __export_source: string;
@@ -39,12 +39,12 @@ async function generateInsomniaExport(): Promise<InsomniaExport> {
       // Add workspace
       resources.push({
         _id: fullCollection.id,
-        _type: 'workspace',
+        _type: "workspace",
         created: Date.now(),
         modified: Date.now(),
         name: fullCollection.name,
-        description: fullCollection.description || '',
-        scope: 'collection'
+        description: fullCollection.description || "",
+        scope: "collection",
       });
 
       // Add requests
@@ -52,20 +52,22 @@ async function generateInsomniaExport(): Promise<InsomniaExport> {
         for (const request of fullCollection.requests) {
           resources.push({
             _id: request.id,
-            _type: 'request',
+            _type: "request",
             parentId: request.folderId || fullCollection.id,
             created: Date.now(),
             modified: Date.now(),
             name: request.name,
-            description: request.description || '',
+            description: request.description || "",
             url: request.url,
             method: request.method,
             headers: request.headers || [],
-            body: request.body ? {
-              mimeType: request.body.mimeType || 'application/json',
-              text: request.body.text || ''
-            } : undefined,
-            parameters: []
+            body: request.body
+              ? {
+                  mimeType: request.body.mimeType || "application/json",
+                  text: request.body.text || "",
+                }
+              : undefined,
+            parameters: [],
           });
         }
       }
@@ -75,13 +77,13 @@ async function generateInsomniaExport(): Promise<InsomniaExport> {
         for (const folder of fullCollection.folders) {
           resources.push({
             _id: folder.id,
-            _type: 'request_group',
+            _type: "request_group",
             parentId: folder.parentId || fullCollection.id,
             created: Date.now(),
             modified: Date.now(),
             name: folder.name,
-            description: folder.description || '',
-            environment: {}
+            description: folder.description || "",
+            environment: {},
           });
         }
       }
@@ -91,13 +93,13 @@ async function generateInsomniaExport(): Promise<InsomniaExport> {
         for (const env of fullCollection.environments) {
           resources.push({
             _id: env.id,
-            _type: 'environment',
+            _type: "environment",
             parentId: fullCollection.id,
             created: Date.now(),
             modified: Date.now(),
             name: env.name,
             data: env.variables || {},
-            isPrivate: false
+            isPrivate: false,
           });
         }
       }
@@ -107,11 +109,11 @@ async function generateInsomniaExport(): Promise<InsomniaExport> {
   }
 
   return {
-    _type: 'export',
+    _type: "export",
     __export_format: 4,
     __export_date: new Date().toISOString(),
-    __export_source: 'insomnia-mcp-server',
-    resources
+    __export_source: "insomnia-mcp-server",
+    resources,
   };
 }
 
@@ -125,54 +127,59 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
   });
 
   // Handle OPTIONS preflight
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     res.statusCode = 200;
     res.end();
     return;
   }
 
-  const url = new URL(req.url || '/', `http://localhost:${PORT}`);
+  const url = new URL(req.url || "/", `http://localhost:${PORT}`);
 
   try {
     switch (url.pathname) {
-      case '/':
-      case '/health':
+      case "/":
+      case "/health":
         res.statusCode = 200;
-        res.end(JSON.stringify({
-          status: 'ok',
-          message: 'Insomnia MCP HTTP Server',
-          endpoints: ['/collections', '/collections/export']
-        }));
+        res.end(
+          JSON.stringify({
+            status: "ok",
+            message: "Insomnia MCP HTTP Server",
+            endpoints: ["/collections", "/collections/export"],
+          })
+        );
         break;
 
-      case '/collections':
+      case "/collections": {
         const collections = await listCollections();
         res.statusCode = 200;
         res.end(JSON.stringify({ collections }));
         break;
+      }
 
-      case '/collections/export':
+      case "/collections/export": {
         const exportData = await generateInsomniaExport();
         res.statusCode = 200;
         res.end(JSON.stringify(exportData, null, 2));
         break;
+      }
 
-      case '/collections/hash':
+      case "/collections/hash": {
         // Return a hash of current collections for change detection
         const collectionsForHash = await listCollections();
-        const hash = Buffer.from(JSON.stringify(collectionsForHash)).toString('base64');
+        const hash = Buffer.from(JSON.stringify(collectionsForHash)).toString("base64");
         res.statusCode = 200;
         res.end(JSON.stringify({ hash, timestamp: Date.now() }));
         break;
+      }
 
       default:
         res.statusCode = 404;
-        res.end(JSON.stringify({ error: 'Not found' }));
+        res.end(JSON.stringify({ error: "Not found" }));
     }
   } catch (error) {
-    console.error('HTTP Server Error:', error);
+    console.error("HTTP Server Error:", error);
     res.statusCode = 500;
-    res.end(JSON.stringify({ error: 'Internal server error' }));
+    res.end(JSON.stringify({ error: "Internal server error" }));
   }
 }
 
@@ -189,8 +196,8 @@ export function startHttpServer(): Promise<void> {
       resolve();
     });
 
-    server.on('error', (error) => {
-      if ((error as any).code === 'EADDRINUSE') {
+    server.on("error", (error) => {
+      if ((error as any).code === "EADDRINUSE") {
         console.log(`⚠️  Port ${PORT} already in use - HTTP server not started`);
         resolve(); // Don't fail the entire process
       } else {

@@ -19,7 +19,7 @@ import {
   updateRequest,
 } from "../src/storage.js";
 
-const TEST_DATA_DIR = path.join(process.cwd(), "tests", "__fixtures__");
+const TEST_DATA_DIR = path.join(process.cwd(), "tests", "__fixtures__", `storage-${Date.now()}`);
 const WORKSPACE_FILE = path.join(TEST_DATA_DIR, "insomnia.Workspace.db");
 const REQUEST_FILE = path.join(TEST_DATA_DIR, "insomnia.Request.db");
 const REQUEST_GROUP_FILE = path.join(TEST_DATA_DIR, "insomnia.RequestGroup.db");

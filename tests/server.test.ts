@@ -12,7 +12,7 @@ describe("server", () => {
   });
 
   it("has proper server info configuration", () => {
-    const server = createServer();
+    createServer();
     expect(SERVER_INFO.name).toMatch(/insomnia/i);
     expect(SERVER_INFO.version).toBeDefined();
   });

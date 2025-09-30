@@ -19,12 +19,12 @@ import {
   writeEnvironmentRecords,
   readProjectRecords,
   nowMillis,
-  WORKSPACE_FILE,
-  REQUEST_FILE,
+  _WORKSPACE_FILE,
+  _REQUEST_FILE,
   DEFAULT_ENVIRONMENT_NAME,
 } from "../src/storage/db.js";
 
-const TEST_DATA_DIR = path.join(process.cwd(), "tests", "__fixtures__");
+const TEST_DATA_DIR = path.join(process.cwd(), "tests", "__fixtures__", `db-${Date.now()}`);
 
 async function cleanup() {
   await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
@@ -38,6 +38,7 @@ describe("database utilities", () => {
   beforeEach(async () => {
     process.env.INSOMNIA_APP_DATA_DIR = TEST_DATA_DIR;
     await cleanup();
+    await ensureDir(); // Ensure directory exists before each test
   });
 
   afterEach(async () => {
@@ -169,8 +170,23 @@ describe("database utilities", () => {
 
   it("reads and writes workspace records with filtering", async () => {
     const records = [
-      { _id: "wrk_1", type: "Workspace", parentId: "proj_1", modified: 1, created: 1, name: "Test", scope: "collection" },
-      { _id: "other_1", type: "Other", parentId: "proj_1", modified: 1, created: 1, name: "Not Workspace" },
+      {
+        _id: "wrk_1",
+        type: "Workspace",
+        parentId: "proj_1",
+        modified: 1,
+        created: 1,
+        name: "Test",
+        scope: "collection",
+      },
+      {
+        _id: "other_1",
+        type: "Other",
+        parentId: "proj_1",
+        modified: 1,
+        created: 1,
+        name: "Not Workspace",
+      },
     ];
 
     await writeWorkspaceRecords(records as any);
@@ -203,9 +219,16 @@ describe("database utilities", () => {
         settingDisableRenderRequestBody: false,
         settingEncodeUrl: true,
         settingRebuildPath: true,
-        settingFollowRedirects: "global"
+        settingFollowRedirects: "global",
       },
-      { _id: "other_1", type: "Other", parentId: "wrk_1", modified: 1, created: 1, name: "Not Request" },
+      {
+        _id: "other_1",
+        type: "Other",
+        parentId: "wrk_1",
+        modified: 1,
+        created: 1,
+        name: "Not Request",
+      },
     ];
 
     await writeRequestRecords(records as any);
@@ -229,9 +252,16 @@ describe("database utilities", () => {
         environment: {},
         environmentPropertyOrder: null,
         metaSortKey: 0,
-        environmentType: "kv"
+        environmentType: "kv",
       },
-      { _id: "other_1", type: "Other", parentId: "wrk_1", modified: 1, created: 1, name: "Not RequestGroup" },
+      {
+        _id: "other_1",
+        type: "Other",
+        parentId: "wrk_1",
+        modified: 1,
+        created: 1,
+        name: "Not RequestGroup",
+      },
     ];
 
     await writeRequestGroupRecords(records as any);
@@ -256,9 +286,16 @@ describe("database utilities", () => {
         color: null,
         isPrivate: false,
         metaSortKey: 0,
-        environmentType: "kv"
+        environmentType: "kv",
       },
-      { _id: "other_1", type: "Other", parentId: "wrk_1", modified: 1, created: 1, name: "Not Environment" },
+      {
+        _id: "other_1",
+        type: "Other",
+        parentId: "wrk_1",
+        modified: 1,
+        created: 1,
+        name: "Not Environment",
+      },
     ];
 
     await writeEnvironmentRecords(records as any);

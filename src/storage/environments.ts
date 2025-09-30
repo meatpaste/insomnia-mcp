@@ -3,7 +3,7 @@ import {
   writeEnvironmentRecords,
   writeWorkspaceRecords,
   nowMillis,
-  type EnvironmentRecord,
+  // type EnvironmentRecord,
 } from "./db.js";
 import { toStoredEnvironment } from "./converters.js";
 import { loadWorkspace } from "./collections.js";
@@ -31,7 +31,9 @@ export async function getEnvironment(collectionId: string): Promise<StoredEnviro
 /**
  * Set an environment variable
  */
-export async function setEnvironmentVariable(input: SetEnvironmentVariableInput): Promise<StoredEnvironment> {
+export async function setEnvironmentVariable(
+  input: SetEnvironmentVariableInput
+): Promise<StoredEnvironment> {
   const { workspace, all } = await loadWorkspace(input.collectionId);
   const environments = await readEnvironmentRecords();
   const environment = environments.find((record) => record.parentId === workspace._id);
