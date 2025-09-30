@@ -1,25 +1,18 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### 0.2.1 (2025-09-30)
 
-## [Unreleased]
 
-### Added
-- Configuration module (`src/config.ts`) for centralized configuration management
-- Custom error classes in `src/errors.ts` for structured error handling
-- `.npmignore` file to exclude development files from npm package
-- Dynamic version reading from package.json in SERVER_INFO
+### 📝 Documentation
 
-### Changed
-- HTTP server is now optional and can be disabled with `INSOMNIA_MCP_DISABLE_HTTP_SERVER` env var
-- HTTP server port can be configured with `INSOMNIA_MCP_HTTP_PORT` env var (default: 3847)
+* Update README with comprehensive features and documentation ([ecc26e2](https://github.com/meatpaste/insomnia-mcp/commit/ecc26e2bf899e71a3a868100691a6858d43c545b))
 
-### Fixed
-- Fixed test suite issues with proper directory setup in test helpers
-- Fixed version mismatch between package.json and constants.ts
+
+### 🧪 Tests
+
+* Achieve A-grade testing - 79 tests, full isolation, integration coverage ([d0d49e5](https://github.com/meatpaste/insomnia-mcp/commit/d0d49e527fb568fed2590f5a493db7407166587d))
 
 ## [0.2.0] - 2025-09-26
 
