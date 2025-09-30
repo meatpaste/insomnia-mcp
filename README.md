@@ -1,13 +1,20 @@
 # Insomnia MCP Server
 
+[![CI](https://github.com/yourusername/insomnia-mcp/workflows/CI/badge.svg)](https://github.com/yourusername/insomnia-mcp/actions)
+[![npm version](https://img.shields.io/npm/v/insomnia-mcp.svg)](https://www.npmjs.com/package/insomnia-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **Insomnia MCP Server** exposes Kong Insomnia-compatible collections, folders, requests, and environments through the [Model Context Protocol](https://modelcontextprotocol.io/) (MCP). It lets MCP-enabled assistants (Claude Desktop, Windsurf, Cursor, etc.) create and manage Insomnia workspaces without touching the GUI.
 
-## Features
+## ✨ Features
 
-- **Collection management** – list and create collections with auto-persisted metadata.
-- **Folder workflows** – create nested folders (Insomnia request groups), move them around, and delete hierarchies safely.
-- **Request lifecycle** – create, update, and delete HTTP requests with headers, bodies, descriptions, optional folder placement, and pre/post request scripts.
-- **Environment variables** – manage per-collection environments.
+- **Collection management** – List and create collections with auto-persisted metadata
+- **Folder workflows** – Create nested folders (Insomnia request groups), move them around, and delete hierarchies safely
+- **Request lifecycle** – Create, update, and delete HTTP requests with headers, bodies, descriptions, optional folder placement, and pre/post request scripts
+- **Environment variables** – Manage per-collection environment variables
+- **Auto-refresh plugin** – Insomnia plugin for automatic collection syncing
+- **User-friendly responses** – Clear, formatted success messages with action summaries
+- **Type-safe** – Full TypeScript support with comprehensive JSDoc documentation
 
 ## Quick Start - Update your MCP configuration
 
@@ -30,24 +37,89 @@ claude mcp add insomnia npx insomnia-mcp@latest
 
 Once connected, explore available tools and resources:
 
-- `list_collections`
-- `create_collection`
-- `create_request`
-- `update_request`
-- `delete_request`
-- `create_folder`
-- `update_folder`
-- `delete_folder`
-- `set_environment_variable`
+### Collection Tools
+- `list_collections` - List all collections
+- `create_collection` - Create new collection
+- `get_collection` - Get collection details
 
-## Tool input reference
+### Request Tools
+- `create_request` - Create HTTP request
+- `update_request` - Update existing request
+- `delete_request` - Delete request
+- `get_request` - Get request details
 
-- **Request tools (`create_request`, `update_request`, `delete_request`)** – always include `collectionId`. Request creation additionally requires `name`, `method`, and `url`. Updates require `requestId` alongside `collectionId`.
-- **Folder tools (`create_folder`, `update_folder`, `delete_folder`)** – always include `collectionId`. Folder creation requires `name`; updates and deletes require `folderId` as well.
-- **Environment tool (`set_environment_variable`)** – requires `collectionId`, `key`, and `value`.
+### Folder Tools
+- `create_folder` - Create folder/group
+- `update_folder` - Update folder
+- `delete_folder` - Delete folder (cascades to children)
+- `get_folder` - Get folder details
 
-If a required field such as `collectionId` is missing, the MCP server returns an `invalid_type` error identifying the missing property. Use the schemas in `src/schemas.ts` for the definitive list of required vs optional tool arguments.
+### Environment Tools
+- `set_environment_variable` - Set variable
+- `get_environment` - Get all variables
+- `get_environment_variable` - Get specific variable
 
-## License
+## 📚 Documentation
+
+- **[Architecture Documentation](./docs/ARCHITECTURE.md)** - System design, data flow, and extension points
+- **[Examples](./examples/README.md)** - Real-world usage examples and workflows
+- **[Changelog](./CHANGELOG.md)** - Version history and release notes
+
+## 🔧 Configuration
+
+Configure via environment variables:
+
+- `INSOMNIA_MCP_DISABLE_HTTP_SERVER=true` - Disable HTTP server (default: false)
+- `INSOMNIA_MCP_HTTP_PORT=3848` - HTTP server port (default: 3847)
+- `INSOMNIA_APP_DATA_DIR=/path/to/data` - Insomnia data directory (default: auto-detected)
+- `INSOMNIA_MCP_PROJECT_ID=proj_custom` - Project ID override (default: auto-detected)
+- `INSOMNIA_MCP_LOG_LEVEL=debug` - Log level: error, warn, info, debug (default: info)
+
+## 🔌 Insomnia Plugin
+
+The project includes an Insomnia plugin for auto-refresh functionality. See [plugin/README.md](./plugin/README.md) for installation instructions.
+
+## 🧪 Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Type checking
+npm run typecheck
+
+# Linting
+npm run lint
+npm run lint:fix
+
+# Formatting
+npm run format
+npm run format:check
+
+# Build
+npm run build
+
+# Development mode (watch)
+npm run dev
+```
+
+## 📝 Contributing
+
+Contributions are welcome! Please see our [Architecture Documentation](./docs/ARCHITECTURE.md) for guidance on extending the project.
+
+## 📄 License
 
 [MIT](./LICENSE) – use, fork, and adapt as needed.
+
+## 🙏 Acknowledgments
+
+Built with:
+- [Model Context Protocol SDK](https://github.com/modelcontextprotocol/typescript-sdk)
+- [Zod](https://github.com/colinhacks/zod) for validation
+- [Vitest](https://vitest.dev/) for testing
