@@ -21,11 +21,21 @@ export function registerCreateCollectionTool(server: McpServer): void {
       });
       server.sendResourceListChanged();
       await server.server.sendResourceUpdated({ uri: COLLECTIONS_RESOURCE_URI });
+
+      const summary = `✅ Created collection "${collection.name}"
+
+Collection ID: ${collection.id}
+Description: ${collection.description || '(none)'}
+Created: ${new Date(collection.createdAt).toLocaleString()}
+
+Full details:
+${JSON.stringify(collection, null, 2)}`;
+
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(collection, null, 2),
+            text: summary,
           },
         ],
       };

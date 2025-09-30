@@ -1,0 +1,36 @@
+# Test files
+tests/
+**/*.test.ts
+**/__fixtures__/
+coverage/
+*.lcov
+
+# Development files
+.github/
+.vscode/
+.idea/
+.claude/
+examples/
+docs/
+
+# Plugin (separate package)
+plugin/
+
+# Build artifacts
+*.tsbuildinfo
+tsconfig.json
+vitest.config.ts
+
+# Logs and temp files
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+tmp/
+temp/
+
+# Environment files
+.env
+.env.*

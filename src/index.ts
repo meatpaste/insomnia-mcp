@@ -10,6 +10,7 @@
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
+import { config } from "./config.js";
 import { ensureSampleData } from "./storage.js";
 import { createServer } from "./server.js";
 import { registerTools } from "./tools.js";
@@ -22,8 +23,10 @@ import { startHttpServer } from "./httpServer.js";
 async function main(): Promise<void> {
   await ensureSampleData();
 
-  // Start HTTP server for Insomnia plugin integration
-  await startHttpServer();
+  // Start HTTP server for Insomnia plugin integration (if enabled)
+  if (config.httpServer.enabled) {
+    await startHttpServer();
+  }
 
   const server = createServer();
   registerTools(server);

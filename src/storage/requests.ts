@@ -50,7 +50,40 @@ export interface GetRequestInput {
 }
 
 /**
- * Create a new request
+ * Create a new HTTP request in a collection
+ *
+ * Creates an HTTP request with the specified method, URL, headers, and body.
+ * Requests can be placed in folders for organization. The request is persisted
+ * to Insomnia's database immediately.
+ *
+ * @param input - Request configuration
+ * @param input.collectionId - The collection to add the request to (required)
+ * @param input.name - Display name for the request (required)
+ * @param input.method - HTTP method (GET, POST, PUT, DELETE, etc.) (required)
+ * @param input.url - Request URL, supports {{template}} variables (required)
+ * @param input.folderId - Optional folder to place request in
+ * @param input.headers - Optional array of HTTP headers
+ * @param input.body - Optional request body with mimeType and text
+ * @param input.description - Optional description
+ * @param input.preRequestScript - Optional JavaScript to run before request
+ * @param input.afterResponseScript - Optional JavaScript to run after response
+ *
+ * @returns The created request with generated ID and timestamps
+ *
+ * @throws {Error} If collection doesn't exist
+ * @throws {Error} If folderId is provided but folder doesn't exist
+ *
+ * @example
+ * ```typescript
+ * const request = await createRequest({
+ *   collectionId: 'wrk_abc123',
+ *   name: 'Get Users',
+ *   method: 'GET',
+ *   url: 'https://api.example.com/users',
+ *   headers: [{ name: 'Authorization', value: 'Bearer {{token}}' }],
+ *   folderId: 'fld_xyz789'
+ * });
+ * ```
  */
 export async function createRequest(input: CreateRequestInput): Promise<StoredRequest> {
   const { workspace, all } = await loadWorkspace(input.collectionId);

@@ -26,11 +26,21 @@ export function registerCreateFolderTool(server: McpServer): void {
       await server.server.sendResourceUpdated({
         uri: `insomnia://collection/${args.collectionId}`,
       });
+
+      const parentInfo = folder.parentId ? `\nParent Folder: ${folder.parentId}` : '';
+      const summary = `✅ Created folder "${folder.name}"
+
+Folder ID: ${folder.id}
+Collection: ${args.collectionId}${parentInfo}
+
+Full details:
+${JSON.stringify(folder, null, 2)}`;
+
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(folder, null, 2),
+            text: summary,
           },
         ],
       };

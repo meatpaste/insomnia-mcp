@@ -5,7 +5,12 @@ import { registerTools } from "../src/tools.js";
 class MockMcpServer {
   public tools: Map<string, any> = new Map();
 
-  tool(name: string, description: string, args: any, handler: any): void {
+  tool(name: string, description: string, argsOrHandler?: any, maybeHandler?: any): void {
+    // Handle both overloads:
+    // tool(name, description, handler) - for tools without args
+    // tool(name, description, args, handler) - for tools with args
+    const handler = maybeHandler !== undefined ? maybeHandler : argsOrHandler;
+    const args = maybeHandler !== undefined ? argsOrHandler : {};
     this.tools.set(name, { name, description, args, handler });
   }
 }

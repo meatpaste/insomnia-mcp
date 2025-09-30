@@ -50,11 +50,20 @@ export function registerUpdateRequestTool(server: McpServer): void {
       await server.server.sendResourceUpdated({
         uri: `insomnia://collection/${args.collectionId}`,
       });
+
+      const summary = `✅ Updated request "${request.name}"
+
+Request ID: ${request.id}
+Collection: ${args.collectionId}
+
+Updated details:
+${JSON.stringify(request, null, 2)}`;
+
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(request, null, 2),
+            text: summary,
           },
         ],
       };

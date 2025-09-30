@@ -87,6 +87,24 @@ export async function getCollection(collectionId: string): Promise<StoredCollect
 
 /**
  * Create a new collection
+ *
+ * Creates a new Insomnia workspace/collection with an associated base environment.
+ * The collection is persisted to the Insomnia database files immediately.
+ *
+ * @param input - Collection configuration
+ * @param input.name - Display name for the collection
+ * @param input.description - Optional description
+ *
+ * @returns The created collection with generated ID, timestamps, and empty environment
+ *
+ * @example
+ * ```typescript
+ * const collection = await createCollection({
+ *   name: "My API",
+ *   description: "REST API for my application"
+ * });
+ * console.log(collection.id); // wrk_abc123...
+ * ```
  */
 export async function createCollection(input: CreateCollectionInput): Promise<StoredCollection> {
   const timestamp = nowMillis();

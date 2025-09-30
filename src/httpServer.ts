@@ -6,9 +6,10 @@
  */
 
 import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { config } from './config.js';
 import { listCollections, getCollection } from './storage/index.js';
 
-const PORT = 3847; // MCP-I (MCP-Insomnia)
+const PORT = config.httpServer.port;
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',

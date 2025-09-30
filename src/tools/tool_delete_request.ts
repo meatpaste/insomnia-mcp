@@ -25,7 +25,7 @@ export function registerDeleteRequestTool(server: McpServer): void {
         content: [
           {
             type: "text" as const,
-            text: `Deleted request ${args.requestId} from collection ${args.collectionId}`,
+            text: `✅ Deleted request ${args.requestId} from collection ${args.collectionId}`,
           },
         ],
       };

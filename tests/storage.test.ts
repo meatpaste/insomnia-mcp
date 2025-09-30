@@ -34,7 +34,7 @@ async function ensureDir() {
 }
 
 async function writeNdjson(filePath: string, records: unknown[]): Promise<void> {
-  await ensureDir();
+  await ensureDir(); // Ensure directory exists before every write
   const content = records.map((record) => JSON.stringify(record)).join("\n");
   const finalContent = content.length > 0 ? `${content}\n` : "";
   await fs.writeFile(filePath, finalContent, "utf-8");

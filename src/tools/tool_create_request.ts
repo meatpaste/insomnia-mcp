@@ -45,11 +45,23 @@ export function registerCreateRequestTool(server: McpServer): void {
       await server.server.sendResourceUpdated({
         uri: `insomnia://collection/${args.collectionId}`,
       });
+
+      const folderInfo = request.folderId ? `\nFolder: ${request.folderId}` : '';
+      const summary = `✅ Created request "${request.name}"
+
+Method: ${request.method.toUpperCase()}
+URL: ${request.url}
+Request ID: ${request.id}
+Collection: ${args.collectionId}${folderInfo}
+
+Full details:
+${JSON.stringify(request, null, 2)}`;
+
       return {
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(request, null, 2),
+            text: summary,
           },
         ],
       };
