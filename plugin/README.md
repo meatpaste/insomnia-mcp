@@ -46,9 +46,10 @@ npm install -g insomnia-plugin-mcp-refresh
 ### Workspace Actions
 Right-click any workspace/collection to access:
 
-1. **"Import from MCP"** - Immediately sync all collections
-2. **"Toggle MCP Auto-Sync"** - Enable/disable automatic polling
-3. **"Check MCP Status"** - View connection and sync status
+1. **"Sync from MCP"** - Import with detailed success/failure feedback
+2. **"Check MCP Connection"** - Test connectivity with response time & collection count
+3. **"Toggle MCP Auto-Sync"** - Enable/disable automatic polling with clear feedback
+4. **"MCP Status & Info"** - View comprehensive plugin status and features
 
 ### Status Templates
 Use these template tags in requests:
@@ -66,11 +67,41 @@ You can also import directly from: `http://localhost:3847/collections/export`
 4. **Smart Notifications**: Alerts when changes are detected
 5. **Manual Control**: Provides workspace actions for immediate sync
 
-## Limitations
+## Recent Improvements
 
+**v0.0.6** - Merge fresh MCP data approach:
+- ✅ **Implemented Approach 2**: Merge fresh MCP data with Insomnia's cached state
+- ✅ **Key insight**: Insomnia caches data in memory, export gives stale data
+- ✅ **Solution**: Fetch fresh data from MCP, merge with Insomnia export, re-import
+- ✅ **Detailed feedback**: Shows MCP connection, import status, and refresh attempt results
+- ✅ **Better diagnostics**: Connection test with response time and collection count
+- ✅ **Clear status reporting**: Every operation reports success/failure with context
+- ✅ **Graceful fallbacks**: Multiple fallback strategies if any step fails
+- ⚠️ **Testing**: Merge approach ensures fresh data is imported, testing if UI refreshes
+
+## Known Limitations
+
+### UI Refresh Requires Restart
+**Issue**: Insomnia's plugin import APIs (`context.data.import.uri()` and `context.data.import.raw()`) successfully import data into the database, but **do not trigger UI refresh**.
+
+**Evidence**:
+- Test confirmed: Collections created via MCP appear after restarting Insomnia
+- Data is correctly written to NDJSON files
+- Import executes without errors
+- UI simply doesn't detect the database changes while running
+
+**Workaround**:
+1. Let auto-import run in background
+2. When you see "MCP Changes Synced" notification
+3. **Restart Insomnia** (⌘Q then reopen on Mac, Alt+F4 on Windows)
+4. Changes will be visible
+
+**Alternative**: Use "Import & Restart Insomnia" workspace action for reminder to restart.
+
+### Other Limitations
 - Requires MCP server to be running on `localhost:3847`
 - Import process may take a few seconds for large collections
-- Some UI elements may require manual refresh to update completely
+- Multiple imports may create duplicate workspaces (Insomnia bug #6125)
 
 ## Troubleshooting
 

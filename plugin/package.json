@@ -1,10 +1,10 @@
 {
   "name": "insomnia-plugin-mcp-refresh",
-  "version": "0.0.2",
+  "version": "0.0.8",
   "private": true,
   "insomnia": {
     "name": "mcp-refresh",
-    "description": "Auto-import MCP collections via HTTP polling - much more reliable!"
+    "description": "Auto-sync MCP collections. Merges fresh MCP data with Insomnia state for UI refresh."
   },
   "main": "main.js"
 }
