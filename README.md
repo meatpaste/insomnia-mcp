@@ -12,7 +12,6 @@
 - **Folder workflows** – Create nested folders (Insomnia request groups), move them around, and delete hierarchies safely
 - **Request lifecycle** – Create, update, and delete HTTP requests with headers, bodies, descriptions, optional folder placement, and pre/post request scripts
 - **Environment variables** – Manage per-collection environment variables
-- **Auto-refresh plugin** – Insomnia plugin for automatic collection syncing
 - **User-friendly responses** – Clear, formatted success messages with action summaries
 - **Type-safe** – Full TypeScript support with comprehensive JSDoc documentation
 
@@ -75,9 +74,22 @@ Configure via environment variables:
 - `INSOMNIA_MCP_PROJECT_ID=proj_custom` - Project ID override (default: auto-detected)
 - `INSOMNIA_MCP_LOG_LEVEL=debug` - Log level: error, warn, info, debug (default: info)
 
-## 🔌 Insomnia Plugin
+### How It Works
 
-The project includes an Insomnia plugin for auto-refresh functionality. See [plugin/README.md](./plugin/README.md) for installation instructions.
+```
+MCP Tool Call (via Claude) → MCP Server updates collections
+                                       ↓
+                    Auto-imports via Insomnia's native import API
+                                       ↓
+                           ✅ UI updates automatically
+```
+
+### Recent Improvements (v0.0.3)
+
+- **Switched to `import.uri()`** for better UI refresh behavior
+- **Auto-imports on change** - no manual "Import from MCP" action needed
+- **Graceful fallback** to `import.raw()` if URL import fails
+- **Better notifications** showing success/failure status
 
 ## 🧪 Development
 

@@ -4,11 +4,10 @@
   "description": "Model Context Protocol server for Kong Insomnia collections",
   "type": "module",
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "bin": {
-    "insomnia-mcp": "./bin/insomnia-mcp.js"
+    "insomnia-mcp": "bin/insomnia-mcp.js"
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --out-dir dist && chmod +x bin/insomnia-mcp.js",

@@ -35,6 +35,9 @@ async function generateInsomniaExport(): Promise<InsomniaExport> {
   for (const collection of collections) {
     try {
       const fullCollection = await getCollection(collection.id);
+      if (!fullCollection) {
+        continue;
+      }
 
       // Add workspace
       resources.push({
@@ -88,21 +91,18 @@ async function generateInsomniaExport(): Promise<InsomniaExport> {
         }
       }
 
-      // Add environments
-      if (fullCollection.environments) {
-        for (const env of fullCollection.environments) {
-          resources.push({
-            _id: env.id,
-            _type: "environment",
-            parentId: fullCollection.id,
-            created: Date.now(),
-            modified: Date.now(),
-            name: env.name,
-            data: env.variables || {},
-            isPrivate: false,
-          });
-        }
-      }
+      // Add environment
+      const env = fullCollection.environment;
+      resources.push({
+        _id: env.id,
+        _type: "environment",
+        parentId: fullCollection.id,
+        created: Date.now(),
+        modified: Date.now(),
+        name: env.name,
+        data: env.variables || {},
+        isPrivate: false,
+      });
     } catch (error) {
       console.error(`Error processing collection ${collection.id}:`, error);
     }
@@ -157,7 +157,18 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
       }
 
       case "/collections/export": {
+        console.error("\n┌─────────────────────────────────────────────────");
+        console.error("│ 📤 HTTP: /collections/export requested");
+        console.error("└─────────────────────────────────────────────────");
+
         const exportData = await generateInsomniaExport();
+
+        console.error("├─────────────────────────────────────────────────");
+        console.error("│ ✅ Export generated");
+        console.error("│ Resources:", exportData.resources.length);
+        console.error("│ Size:", JSON.stringify(exportData).length, "bytes");
+        console.error("└─────────────────────────────────────────────────\n");
+
         res.statusCode = 200;
         res.end(JSON.stringify(exportData, null, 2));
         break;
@@ -167,8 +178,20 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
         // Return a hash of current collections for change detection
         const collectionsForHash = await listCollections();
         const hash = Buffer.from(JSON.stringify(collectionsForHash)).toString("base64");
+        const hashShort = hash.substring(0, 12);
+
+        console.error(
+          `[HTTP] 🔍 Hash requested: ${hashShort}... (${collectionsForHash.length} collections)`
+        );
+
         res.statusCode = 200;
-        res.end(JSON.stringify({ hash, timestamp: Date.now() }));
+        res.end(
+          JSON.stringify({
+            hash,
+            timestamp: Date.now(),
+            collectionCount: collectionsForHash.length,
+          })
+        );
         break;
       }
 
@@ -191,14 +214,14 @@ export function startHttpServer(): Promise<void> {
     const server = createServer(handleRequest);
 
     server.listen(PORT, () => {
-      console.log(`🌐 Insomnia MCP HTTP Server running on http://localhost:${PORT}`);
-      console.log(`📥 Import URL: http://localhost:${PORT}/collections/export`);
+      console.error(`🌐 Insomnia MCP HTTP Server running on http://localhost:${PORT}`);
+      console.error(`📥 Import URL: http://localhost:${PORT}/collections/export`);
       resolve();
     });
 
     server.on("error", (error) => {
       if ((error as any).code === "EADDRINUSE") {
-        console.log(`⚠️  Port ${PORT} already in use - HTTP server not started`);
+        console.error(`⚠️  Port ${PORT} already in use - HTTP server not started`);
         resolve(); // Don't fail the entire process
       } else {
         reject(error);
